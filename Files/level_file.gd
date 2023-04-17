@@ -31,6 +31,7 @@ enum {
 @export var deco_textures : Array[String]
 @export var decoration : Array[Dictionary]
 @export var world_settings : WorldSettings
+@export var project_path : String
 
 
 func _init() -> void:
