@@ -32,5 +32,14 @@ func display(level: LevelFile) -> void:
 						img.set_pixel(x,y, Color.WHITE)
 					index += 1
 		
+		if level.world_settings:
+			var tile_size := level.world_settings.tile_size
+			
+			for r in level.respawn_points:
+				var world_pos := level.respawn_points[r] as Vector2
+				if Rect2(Vector2(), level.world_settings.screen_size_px).has_point(world_pos):
+					var tile_pos := (world_pos / tile_size).floor()
+					img.set_pixel(tile_pos.x, tile_pos.y, Color.DARK_OLIVE_GREEN)
+		
 		var tex := ImageTexture.create_from_image(img)
 		%Bitmask.texture = tex
