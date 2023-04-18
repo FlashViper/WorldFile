@@ -26,6 +26,7 @@ func _enter_tree() -> void:
 	add_import_plugin(importer_world)
 	
 	inspector_level = Inspector_Level.new()
+	inspector_level.interface = get_editor_interface()
 	add_inspector_plugin(inspector_level)
 	inspector_world = Inspector_World.new()
 	add_inspector_plugin(inspector_world)

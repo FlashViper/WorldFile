@@ -1,6 +1,15 @@
 @tool
 extends Control
 
+signal display_toggled
+
+@onready var toggle_details: Button = %ToggleDetails
+
+
+func _ready() -> void:
+	toggle_details.pressed.connect(func(): display_toggled.emit(), CONNECT_DEFERRED)
+
+
 func display(level: LevelFile) -> void:
 	%LevelName.text = level.name if level.name != "" else "Untitled Level"
 	%LevelSize.text = "
@@ -25,5 +34,3 @@ func display(level: LevelFile) -> void:
 		
 		var tex := ImageTexture.create_from_image(img)
 		%Bitmask.texture = tex
-	else:
-		pass

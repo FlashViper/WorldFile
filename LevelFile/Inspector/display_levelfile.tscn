@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://d13e6mxbstfro"]
 
 [ext_resource type="Script" path="res://addons/WorldFile/LevelFile/Inspector/display_levelfile.gd" id="1_5117f"]
 
@@ -53,3 +53,8 @@ texture_repeat = 1
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 stretch_mode = 5
+
+[node name="ToggleDetails" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Show Details (for nerds)"
