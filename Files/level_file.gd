@@ -4,6 +4,8 @@ extends Resource
 
 const VERSION := &"0.1 development"
 
+const PATTERN_PROPERTY := &"\t*(.*?):[\t ]*(.*)" # [name]: [thing]
+
 enum {
 	ID_NULL,
 	ID_TILEDATA,
@@ -31,7 +33,6 @@ enum {
 @export var deco_textures : Array[String]
 @export var decoration : Array[Dictionary]
 @export var world_settings : WorldSettings
-@export var project_path : String
 
 
 func _init() -> void:
@@ -41,6 +42,7 @@ func _init() -> void:
 	if !Engine.is_editor_hint():
 		size = ProjectManager.minimum_screen_size
 
+
 static func loadFromFile(path: StringName) -> LevelFile:
 	if !FileAccess.file_exists(path):
 		return LevelFile.new()
@@ -49,7 +51,7 @@ static func loadFromFile(path: StringName) -> LevelFile:
 	var l := LevelFile.new()
 	
 	var parser := preload("../StringParser.gd").new()
-	var r_property := RegEx.create_from_string(&"\t*(.*):[\t ]*(.*)") # [name]: [thing]
+	var r_property := RegEx.create_from_string(PATTERN_PROPERTY)
 	var r_datablock := RegEx.create_from_string(&"^\\[(.*)\\]")
 	
 	# TODO: Throw warning when level is of a different version
@@ -77,13 +79,7 @@ static func loadFromFile(path: StringName) -> LevelFile:
 	for category in properties:
 		match category:
 			"":
-				for line in properties[category]:
-					var m := r_property.search(line)
-					if m:
-						var parsed_value = str_to_var(m.get_string(2))
-						if parsed_value == null:
-							parsed_value = parser.attempt_parse(m.get_string(2))
-						l.set(m.get_string(1), parsed_value)
+				load_basic_properties(l, properties[category])
 			"TEXTURES":
 				for prop in properties[category]:
 					l.deco_textures.append(prop)
@@ -94,7 +90,6 @@ static func loadFromFile(path: StringName) -> LevelFile:
 					if m:
 						var position = parser.attempt_parse(m.get_string(2))
 						
-						prints(m.get_string(2), position)
 						if position is Vector2:
 							l.respawn_points[m.get_string(1)] = position
 				
@@ -118,6 +113,26 @@ static func loadFromFile(path: StringName) -> LevelFile:
 	return l
 
 
+static func load_basic_properties(l: LevelFile, properties: Array) -> void:
+	var r_property := RegEx.create_from_string(PATTERN_PROPERTY) # [name]: [thing]
+	var parser := preload("../StringParser.gd").new()
+	
+	for line in properties:
+		var m := r_property.search(line)
+		if m:
+			var property_id := m.get_string(1)
+			match property_id:
+				"world_settings":
+					if ResourceLoader.exists(m.get_string(2)):
+						l.world_settings = ResourceLoader.load(m.get_string(2))
+					continue
+			
+			var parsed_value = str_to_var(m.get_string(2))
+			if parsed_value == null:
+				parsed_value = parser.attempt_parse(m.get_string(2))
+			l.set(m.get_string(1), parsed_value)
+
+
 func save_to_file(path: StringName) -> void:
 	const HEADER := &"FlashViper WorldFile\nVersion %s\n"
 	const PROPERTY_TAG := &"%s: %s"
@@ -127,6 +142,8 @@ func save_to_file(path: StringName) -> void:
 	f.store_line(HEADER % VERSION)
 	f.store_line(PROPERTY_TAG % ["name", name])
 	f.store_line(PROPERTY_TAG % ["size", var_to_str(size)])
+	if world_settings:
+		f.store_line(PROPERTY_TAG % ["world_settings", world_settings.resource_path])
 	
 	if deco_textures.size() > 0:
 		f.store_line("[TEXTURES]")
