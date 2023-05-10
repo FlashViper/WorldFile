@@ -8,5 +8,5 @@ class_name LevelData extends Resource
 @export var size : Vector2i = Vector2i.ONE * 2
 @export var connections : PackedInt64Array
 
-func getRect() -> Rect2i:
+func get_rect() -> Rect2i:
 	return Rect2i(position, size)

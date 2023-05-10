@@ -38,7 +38,7 @@ func _import(source_file, save_path, options, platform_variants, gen_files) -> E
 	if !FileAccess.file_exists(source_file):
 		return FAILED
 		
-	var world := WorldFile.loadFromFile(source_file)
+	var world := WorldFile.load_from_file(source_file)
 	var filename = save_path + "." + _get_save_extension()
 	
 	var err := ResourceSaver.save(world, filename)

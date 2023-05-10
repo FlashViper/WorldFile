@@ -30,8 +30,14 @@ func updateWorld(world: WorldFile) -> void:
 		for l in world.levels:
 			var r := Rect2(l.position, l.size)
 			
-			minPos = min(minPos, r.position)
-			maxPos = max(maxPos, r.end)
+			minPos = Vector2(
+				minf(minPos.x, r.position.x),
+				minf(minPos.y, r.position.y),
+			)
+			maxPos = Vector2(
+				minf(maxPos.x, r.position.x),
+				minf(maxPos.y, r.position.y),
+			)
 			
 			rects.append(r)
 		

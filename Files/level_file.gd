@@ -17,6 +17,8 @@ enum {
 	DECO_IMAGE,
 	DECO_SCENE,
 	DECO_IMAGE_COLOR,
+	DECO_ATLAS,
+	DEGO_PACKED_ATLAS,
 }
 
 # METADATA
@@ -39,11 +41,13 @@ func _init() -> void:
 	deco_textures = []
 	decoration = []
 	
-	if !Engine.is_editor_hint():
-		size = ProjectManager.minimum_screen_size
+	if !Engine.is_editor_hint() and world_settings:
+		size = world_settings.minimum_screen_size
 
 
-static func loadFromFile(path: StringName) -> LevelFile:
+static func load_from_file(path_raw: StringName) -> LevelFile:
+	var path := ProjectManager.convert_path(path_raw)
+	
 	if !FileAccess.file_exists(path):
 		return LevelFile.new()
 	
@@ -102,13 +106,23 @@ static func loadFromFile(path: StringName) -> LevelFile:
 			ID_DECORATION:
 				var length := f.get_32()
 				for i in length:
+					var obj := {}
+					
 					var deco_type := f.get_16()
 					var path_id := f.get_32()
 					var transform := f.get_var() as Transform2D
-					l.decoration.append({
-						"path_index": path_id,
-						"transform": transform,
-					})
+					
+					obj["type"] = deco_type
+					obj["path_index"] = path_id
+					obj["transform"] = transform
+					
+					match deco_type:
+						DECO_IMAGE:
+							pass
+						DECO_ATLAS:
+							obj["region"] = f.get_var() as Rect2i
+					
+					l.decoration.append(obj)
 	
 	return l
 
@@ -133,11 +147,17 @@ static func load_basic_properties(l: LevelFile, properties: Array) -> void:
 			l.set(m.get_string(1), parsed_value)
 
 
-func save_to_file(path: StringName) -> void:
+func save_to_file(path_raw: StringName) -> void:
 	const HEADER := &"FlashViper WorldFile\nVersion %s\n"
 	const PROPERTY_TAG := &"%s: %s"
 	
+	var path := ProjectManager.convert_path(path_raw)
+	path = path.rstrip(" \t").lstrip(" \t")
 	var f := FileAccess.open(path, FileAccess.WRITE)
+	
+	if !f:
+		printerr("level_file.gd->saveto_file(): Could not find file at path " + path)
+		return
 	
 	f.store_line(HEADER % VERSION)
 	f.store_line(PROPERTY_TAG % ["name", name])

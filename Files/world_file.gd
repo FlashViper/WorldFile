@@ -12,7 +12,7 @@ func _init() -> void:
 	levels = []
 
 
-static func loadFromFile(path: StringName) -> WorldFile:
+static func load_from_file(path: StringName) -> WorldFile:
 	if !FileAccess.file_exists(path):
 		return WorldFile.new()
 	
