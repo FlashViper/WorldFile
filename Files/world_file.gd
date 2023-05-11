@@ -12,7 +12,7 @@ func _init() -> void:
 	levels = []
 
 
-static func load_from_file(path: StringName) -> WorldFile:
+static func load_from_file(path: String) -> WorldFile:
 	if !FileAccess.file_exists(path):
 		return WorldFile.new()
 	
@@ -64,7 +64,7 @@ static func load_from_file(path: StringName) -> WorldFile:
 	
 	return w
 
-func save_to_file(path: StringName) -> void:
+func save_to_file(path: String) -> void:
 	const VERSION_TAG := &"FlashViper WorldFile\nVersion %s"
 	const PROPERTY_TAG := &"%s: %s"
 	const LEVEL_TAG := &"Level %02d:"

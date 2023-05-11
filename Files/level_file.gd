@@ -45,7 +45,7 @@ func _init() -> void:
 		size = world_settings.minimum_screen_size
 
 
-static func load_from_file(path_raw: StringName) -> LevelFile:
+static func load_from_file(path_raw: String) -> LevelFile:
 	var path := ProjectManager.convert_path(path_raw)
 	
 	if !FileAccess.file_exists(path):
@@ -147,7 +147,7 @@ static func load_basic_properties(l: LevelFile, properties: Array) -> void:
 			l.set(m.get_string(1), parsed_value)
 
 
-func save_to_file(path_raw: StringName) -> void:
+func save_to_file(path_raw: String) -> void:
 	const HEADER := &"FlashViper WorldFile\nVersion %s\n"
 	const PROPERTY_TAG := &"%s: %s"
 	
