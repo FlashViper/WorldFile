@@ -5,6 +5,7 @@ extends Resource
 const VERSION := &"0.1 development"
 
 const PATTERN_PROPERTY := &"\t*(.*?):[\t ]*(.*)" # [name]: [thing]
+const WHITE_SPACE := &" \t"
 
 enum {
 	ID_NULL,
@@ -46,8 +47,8 @@ func _init() -> void:
 
 
 static func load_from_file(path_raw: String) -> LevelFile:
-	var path := ProjectManager.convert_path(path_raw)
-	
+	var path := path_raw.lstrip(WHITE_SPACE).rstrip(WHITE_SPACE)
+
 	if !FileAccess.file_exists(path):
 		return LevelFile.new()
 	
@@ -151,8 +152,7 @@ func save_to_file(path_raw: String) -> void:
 	const HEADER := &"FlashViper WorldFile\nVersion %s\n"
 	const PROPERTY_TAG := &"%s: %s"
 	
-	var path := ProjectManager.convert_path(path_raw)
-	path = path.rstrip(" \t").lstrip(" \t")
+	var path := path_raw.rstrip(WHITE_SPACE).lstrip(WHITE_SPACE)
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	
 	if !f:
