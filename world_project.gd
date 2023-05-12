@@ -10,7 +10,7 @@ extends Resource
 @export var deco_palettes : Array = []
 
 var minimum_screen_size : Vector2i :
-	get: return screen_size_px / tile_size
+	get: return Vector2i((Vector2(screen_size_px) / tile_size).ceil())
 
 
 static func create_new(p_tile_size: int, p_screen_size: Vector2i) -> WorldSettings:
