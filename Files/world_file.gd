@@ -20,7 +20,7 @@ static func load_from_file(path: String) -> WorldFile:
 	var w := WorldFile.new()
 	var parser := StringParser.new()
 	
-	var r_property := RegEx.create_from_string(&"\t*(.*):[\t ]*(.*)")
+	var r_property := RegEx.create_from_string(&"\t*(.*?):[\t ]*(.*)")
 	var r_level := RegEx.create_from_string(&"Level[ \t]*(\\d*)")
 	
 	f.get_line() # TODO: Check against header to verify the correct file type
@@ -94,7 +94,7 @@ func save_to_file(path: String) -> void:
 		
 		properties = [
 			["name", l.name],
-			["filePath", l.filePath],
+			["file_path", l.file_path],
 			["position", l.position],
 			["size", l.size],
 			["connections", l.connections],
