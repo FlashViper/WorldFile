@@ -11,6 +11,7 @@ var dataDisplays : Array[Control]
 func _ready() -> void:
 	levelSearch.text_changed.connect(updateSearch)
 
+
 func display(new : WorldFile = null) -> void:
 	if new:
 		world = new
@@ -35,8 +36,10 @@ func display(new : WorldFile = null) -> void:
 	
 	%LayoutView.updateWorld(world)
 
+
 func getLevelRoot() -> Control:
 	return %LevelRoot
+
 
 # TODO
 func updateSearch(text: String) -> void:

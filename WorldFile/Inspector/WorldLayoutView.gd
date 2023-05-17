@@ -35,8 +35,8 @@ func updateWorld(world: WorldFile) -> void:
 				minf(minPos.y, r.position.y),
 			)
 			maxPos = Vector2(
-				minf(maxPos.x, r.position.x),
-				minf(maxPos.y, r.position.y),
+				maxf(maxPos.x, r.end.x),
+				maxf(maxPos.y, r.end.y),
 			)
 			
 			rects.append(r)
@@ -45,6 +45,7 @@ func updateWorld(world: WorldFile) -> void:
 		minPos -= Vector2.ONE * PADDING
 		maxPos += Vector2.ONE * PADDING
 		
+		prints(maxPos, minPos)
 		viewBounds = Rect2(minPos, maxPos - minPos)
 	
 	if display:
@@ -73,5 +74,4 @@ func transformRect(r: Rect2) -> Rect2:
 		inverse_lerp(0, viewBounds.size.x, r.size.x),
 		inverse_lerp(0, viewBounds.size.y, r.size.y)
 	)
-	
 	return Rect2(normalized.position * display.size, normalized.size * display.size)

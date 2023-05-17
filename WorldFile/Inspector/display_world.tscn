@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://cwjwqu0o0im8n"]
 
 [ext_resource type="Script" path="res://addons/WorldFile/WorldFile/Inspector/display_world.gd" id="1_bujif"]
 [ext_resource type="Script" path="res://addons/WorldFile/WorldFile/Inspector/WorldLayoutView.gd" id="2_4d8u6"]
