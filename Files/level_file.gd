@@ -80,7 +80,6 @@ static func load_from_file(path_raw: String) -> LevelFile:
 		
 		new_line = f.get_line()
 	
-	
 	for category in properties:
 		match category:
 			"":
@@ -137,15 +136,14 @@ static func load_basic_properties(l: LevelFile, properties: Array) -> void:
 		if m:
 			var property_id := m.get_string(1)
 			match property_id:
+				"name":
+					l.name = m.get_string(2)
 				"world_settings":
 					if ResourceLoader.exists(m.get_string(2)):
 						l.world_settings = ResourceLoader.load(m.get_string(2))
-					continue
-			
-			var parsed_value = str_to_var(m.get_string(2))
-			if parsed_value == null:
-				parsed_value = parser.attempt_parse(m.get_string(2))
-			l.set(m.get_string(1), parsed_value)
+				_:
+					var parsed_value = str_to_var(m.get_string(2))
+					l.set(m.get_string(1), parsed_value)
 
 
 func save_to_file(path_raw: String) -> void:
