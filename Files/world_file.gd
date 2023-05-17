@@ -6,6 +6,7 @@ const StringParser := preload("../StringParser.gd")
 
 @export var name : StringName
 @export var levels : Array[LevelData]
+@export var settings : WorldSettings
 
 func _init() -> void:
 	name = &""
@@ -35,13 +36,21 @@ static func load_from_file(path: String) -> WorldFile:
 		
 		var p := r_property.search(newLine)
 		if p:
-			w.set(p.get_string(1), str_to_var(p.get_string(2)))
+			match p.get_string(1):
+				"settings":
+					w.settings = load(p.get_string(2))
+				_:
+					w.set(
+						p.get_string(1), 
+						str_to_var(p.get_string(2))
+					)
 	
 	w.levels = []
 	var levelCount := -1
-	var currentLevel : LevelData
+	var currentLevel := LevelData.new()
 	
 	while f.get_position() < f.get_length():
+		newLine = f.get_line()
 		if newLine.begins_with("\t"):
 			var p := r_property.search(newLine)
 			if p:
@@ -60,7 +69,10 @@ static func load_from_file(path: String) -> WorldFile:
 				if currentLevel:
 					w.levels.append(currentLevel)
 				currentLevel = LevelData.new()
-		newLine = f.get_line()
+				currentLevel.name = newLine.rstrip(":")
+	
+	if currentLevel:
+		w.levels.append(currentLevel)
 	
 	return w
 
@@ -80,6 +92,7 @@ func save_to_file(path: String) -> void:
 	
 	var properties := [
 		["name", name],
+		["settings", settings.resource_path]
 #		["devNotes", name],
 	]
 	
@@ -102,3 +115,7 @@ func save_to_file(path: String) -> void:
 		
 		for p in properties:
 			f.store_line("\t" + (PROPERTY_TAG % [p[0], var_to_str(p[1])]))
+
+
+func convert_path() -> void:
+	pass
