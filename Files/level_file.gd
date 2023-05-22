@@ -17,9 +17,14 @@ enum {
 enum {
 	DECO_IMAGE,
 	DECO_SCENE,
-	DECO_IMAGE_COLOR,
 	DECO_ATLAS,
-	DEGO_PACKED_ATLAS,
+	DECO_PACKED_ATLAS,
+}
+
+enum {
+	DECO_DATA_FINISHED,
+	DECO_DATA_COLOR,
+	DECO_DATA_DEPTH,
 }
 
 # METADATA
@@ -104,25 +109,7 @@ static func load_from_file(path_raw: String) -> LevelFile:
 				var length := f.get_32()
 				l.tileData = f.get_buffer(length)
 			ID_DECORATION:
-				var length := f.get_32()
-				for i in length:
-					var obj := {}
-					
-					var deco_type := f.get_16()
-					var path_id := f.get_32()
-					var transform := f.get_var() as Transform2D
-					
-					obj["type"] = deco_type
-					obj["path_index"] = path_id
-					obj["transform"] = transform
-					
-					match deco_type:
-						DECO_IMAGE:
-							pass
-						DECO_ATLAS:
-							obj["region"] = f.get_var() as Rect2i
-					
-					l.decoration.append(obj)
+				load_decoration(l, f)
 	
 	return l
 
@@ -144,6 +131,30 @@ static func load_basic_properties(l: LevelFile, properties: Array) -> void:
 				_:
 					var parsed_value = str_to_var(m.get_string(2))
 					l.set(m.get_string(1), parsed_value)
+
+
+static func load_decoration(l: LevelFile, f: FileAccess) -> void:
+	var decoration : Array[Dictionary] = []
+	var size := f.get_32()
+	
+	for i in size:
+		var data := {}
+		data["decoration_type"] = f.get_16()
+		data["filepath_index"] = f.get_32()
+		data["transform"] = f.get_var() as Transform2D
+		match data["decoration_type"]:
+			DECO_ATLAS:
+				data["region"] = f.get_var() as Rect2i
+		var data_type := f.get_8()
+		while data_type != DECO_DATA_FINISHED and f.get_position() < f.get_length():
+			match data_type:
+				DECO_DATA_COLOR:
+					data["color"] = f.get_var() as Color
+				DECO_DATA_DEPTH:
+					data["depth"] = f.get_float()
+			data_type = f.get_8()
+		decoration.append(data)
+	l.decoration = decoration
 
 
 func save_to_file(path_raw: String) -> void:
@@ -190,9 +201,29 @@ func save_to_file(path_raw: String) -> void:
 		f.store_8(ID_DECORATION)
 		f.store_32(decoration.size())
 		for d in decoration:
-			var path_index := d["path_index"] as int
-			var transform_packed := d["transform"] as Transform2D
+			var data_type := d["decoration_type"] as int
+			var filepath_index := d["filepath_index"] as int
+			var object_transform := d["transform"] as Transform2D
 			
-			f.store_16(DECO_IMAGE) # Sprite based decoration by default
-			f.store_32(path_index)
-			f.store_var(transform_packed)
+			f.store_16(data_type) # Sprite based decoration by default
+			f.store_32(filepath_index)
+			f.store_var(object_transform)
+			match data_type:
+				DECO_IMAGE:
+					pass
+				DECO_ATLAS:
+					f.store_var(d["region"] as Rect2i)
+				DECO_PACKED_ATLAS:
+					pass
+				DECO_SCENE:
+					pass
+				_:
+					pass
+			
+			if d.has("color"):
+				f.store_8(DECO_DATA_COLOR)
+				f.store_var(d["color"] as Color)
+			if d.has("depth"):
+				f.store_8(DECO_DATA_DEPTH)
+				f.store_float(d["depth"])
+			f.store_8(DECO_DATA_FINISHED)
