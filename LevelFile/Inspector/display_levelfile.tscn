@@ -1,11 +1,11 @@
 [gd_scene load_steps=2 format=3 uid="uid://d13e6mxbstfro"]
 
-[ext_resource type="Script" path="res://addons/WorldFile/LevelFile/Inspector/display_levelfile.gd" id="1_5117f"]
+[ext_resource type="Script" path="res://addons/world_file/LevelFile/Inspector/display_levelfile.gd" id="1_05y0b"]
 
 [node name="Inspector" type="PanelContainer"]
 offset_right = 127.0
 offset_bottom = 145.0
-script = ExtResource("1_5117f")
+script = ExtResource("1_05y0b")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
