@@ -189,11 +189,11 @@ func save_to_file(path_raw: String) -> void:
 	f.store_line("[DATA]")
 	# Store Tile Data
 	f.store_8(ID_TILEDATA)
+	f.store_32(tile_data.size())
+	f.store_buffer(tile_data)
 	
 	# Store Entity Data
 	# TODO
-	f.store_32(tile_data.size())
-	f.store_buffer(tile_data)
 	
 	# Store Decoration Data
 	# TODO

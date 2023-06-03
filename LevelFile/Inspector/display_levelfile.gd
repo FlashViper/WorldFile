@@ -24,11 +24,11 @@ func display(level: LevelFile) -> void:
 			Image.FORMAT_RGB8
 		)
 		
-		if level.tileData.size() > 0:
+		if level.tile_data.size() > 0:
 			var index := 0
 			for y in level.size.y:
 				for x in level.size.x:
-					if level.tileData[index] != 0:
+					if level.tile_data[index] != 0:
 						img.set_pixel(x,y, Color.WHITE)
 					index += 1
 		
