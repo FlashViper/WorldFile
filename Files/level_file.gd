@@ -33,7 +33,7 @@ enum {
 @export var size : Vector2i
 
 # TODO: Compression???
-@export var tileData : PackedByteArray
+@export var tile_data : PackedByteArray
 
 # {String -> Vector2}
 @export var respawn_points : Dictionary
@@ -107,7 +107,7 @@ static func load_from_file(path_raw: String) -> LevelFile:
 		match id:
 			ID_TILEDATA:
 				var length := f.get_32()
-				l.tileData = f.get_buffer(length)
+				l.tile_data = f.get_buffer(length)
 			ID_DECORATION:
 				load_decoration(l, f)
 	
@@ -165,7 +165,7 @@ func save_to_file(path_raw: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	
 	if !f:
-		printerr("level_file.gd->saveto_file(): Could not find file at path " + path)
+		printerr("level_file.gd->save_to_file(): Could not find file at path " + path)
 		return
 	
 	f.store_line(HEADER % VERSION)
@@ -189,11 +189,11 @@ func save_to_file(path_raw: String) -> void:
 	f.store_line("[DATA]")
 	# Store Tile Data
 	f.store_8(ID_TILEDATA)
-	f.store_32(tileData.size())
-	f.store_buffer(tileData)
 	
 	# Store Entity Data
 	# TODO
+	f.store_32(tile_data.size())
+	f.store_buffer(tile_data)
 	
 	# Store Decoration Data
 	# TODO
