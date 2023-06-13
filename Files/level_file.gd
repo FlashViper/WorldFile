@@ -29,18 +29,20 @@ enum {
 
 # METADATA
 @export var name : StringName
-
 @export var size : Vector2i
+@export var world_settings : WorldSettings
+
 
 # TODO: Compression???
 @export var tile_data : PackedByteArray
 
-# {String -> Vector2}
-@export var respawn_points : Dictionary
-@export var entities : Dictionary
+@export var entity_paths : Dictionary
+@export var entities : Array[Dictionary]
+
 @export var deco_textures : Array[String]
 @export var decoration : Array[Dictionary]
-@export var world_settings : WorldSettings
+# {String -> Vector2}
+@export var respawn_points : Dictionary
 
 
 func _init() -> void:
@@ -101,6 +103,16 @@ static func load_from_file(path_raw: String) -> LevelFile:
 						
 						if position is Vector2:
 							l.respawn_points[m.get_string(1)] = position
+			"ENTITY_PATHS":
+				l.entity_paths = {}
+				for line in properties[category]:
+					var m := r_property.search(line)
+					if m:
+						var id := m.get_string(1)
+						var filepath := m.get_string(2)
+						l.entity_paths[id] = filepath
+			"ENTITIES":
+				pass
 				
 	while f.get_position() < f.get_length():
 		var id := f.get_8() # pull one byte from the file to tell us what to parse next
@@ -174,6 +186,18 @@ func save_to_file(path_raw: String) -> void:
 	if world_settings:
 		f.store_line(PROPERTY_TAG % ["world_settings", world_settings.resource_path])
 	
+	if entities.size() > 0:
+		f.store_line("[ENTITY_PATHS]")
+		for p in entity_paths:
+			f.store_line(PROPERTY_TAG % [p, entity_paths[p]])
+		f.store_line("")
+		f.store_line("[ENTITIES]")
+		for e in entities:
+			f.store_line("%s:" % e["id"])
+			for p in e["properties"]:
+				f.store_line("\t" + (PROPERTY_TAG % [p, e["properties"][p]]))
+		f.store_line("")
+	
 	if deco_textures.size() > 0:
 		f.store_line("[TEXTURES]")
 		for d in deco_textures:
@@ -191,9 +215,6 @@ func save_to_file(path_raw: String) -> void:
 	f.store_8(ID_TILEDATA)
 	f.store_32(tile_data.size())
 	f.store_buffer(tile_data)
-	
-	# Store Entity Data
-	# TODO
 	
 	# Store Decoration Data
 	# TODO
